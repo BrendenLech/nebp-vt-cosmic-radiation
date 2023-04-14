@@ -8,7 +8,8 @@
 #define MPL_MOSI 11
 #define MPL_CS 10
 #define cardSelect 4
-#define SEALEVELPRESSURE_HPA (1013.25) //Change this value to the sea level pressure for current location during launch 
+#define ERROR_DISPLAY_PIN 13
+#define SEALEVELPRESSURE_HPA (1014) //Change this value to the sea level pressure for current location during launch 
 
 #define USE_MPL 1
 #define USE_LOG 1
@@ -26,9 +27,9 @@ void error(uint8_t errno) {
   while(1)   {
     uint8_t i;
     for (i = 0; i < errno; i++) {
-      digitalWrite(ERROR_DISPLAY_PIN, HIGH);
+      digitalWrite(13, HIGH);
       delay(100);
-      digitalWrite(ERROR_DISPLAY_PIN, LOW);
+      digitalWrite(13, LOW);
       delay(100);
     }
     for (i = errno; i < 10; i++) {
@@ -54,7 +55,7 @@ void setup() {
       Serial.println("Found MPL3115A2 sensor");
     }
   #endif // USE_SERIAL
-  #endif // USE_BME
+  #endif // USE_MPL
 
   /* This creates a file in the SD card to write too */
   #ifdef USE_LOG
@@ -90,7 +91,7 @@ void setup() {
   Serial.print("Writing to "); 
   Serial.println(filename);
   #endif // USE_LOG
-  pinMode(ERROR_PIN, OUTPUT);
+  pinMode(13, OUTPUT);
   pinMode(8, OUTPUT);
   Serial.println("Ready!");
 }
@@ -98,11 +99,6 @@ void setup() {
 void loop() {
   /*Collects Pressure and Altitude from the MPL3115A2*/
   #ifdef USE_MPL
-    /*Checks if the MPL3115A2 is reading data*/
-    if (! mpl.performReading()) {
-      Serial.println("Failed to perform reading :(");
-      return;
-    }
   /*Logs the Pressure*/
   #if USE_SERIAL
     Serial.print("Pressure: ");
@@ -115,7 +111,7 @@ void loop() {
   /*Logs the altitude*/
   #if USE_SERIAL
     Serial.print("Approx. Altitude = ");
-    Serial.print(bme.readAltitude(mpl.getAltitude());
+    Serial.print(mpl.getAltitude());
     Serial.println(" m");
   #endif // USE_SERIAL
   #ifdef USE_LOG
