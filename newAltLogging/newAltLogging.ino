@@ -10,8 +10,6 @@
 #define cardSelect 4
 #define SEALEVELPRESSURE_HPA (1013.25) //Change this value to the sea level pressure for current location during launch 
 
-#define ERROR_DISPLAY_PIN 13
-
 #define USE_MPL 1
 #define USE_LOG 1
 #define USE_SERIAL 1 //Comment this out for flight to save memory
@@ -42,7 +40,7 @@ void error(uint8_t errno) {
 void setup() {
   Serial.begin(9600);
   while (!Serial);
-  
+
   /* This checks if the MPL3115A2 sensor is actually connected lol */
   #ifdef USE_MPL  
     Serial.println(F("MPL3115A2 test"));
