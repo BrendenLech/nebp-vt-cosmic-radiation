@@ -2,7 +2,6 @@
 #include <SPI.h>
 #include <SD.h>
 #include <Adafruit_MPL3115A2.h>
-#include "Adafruit_MPL3115A2.h"
 
 #define MPL_SCK 13
 #define MPL_MISO 12
@@ -43,6 +42,7 @@ void error(uint8_t errno) {
 void setup() {
   Serial.begin(9600);
   while (!Serial);
+  
   /* This checks if the MPL3115A2 sensor is actually connected lol */
   #ifdef USE_MPL  
     Serial.println(F("MPL3115A2 test"));
@@ -57,6 +57,7 @@ void setup() {
     }
   #endif // USE_SERIAL
   #endif // USE_BME
+
   /* This creates a file in the SD card to write too */
   #ifdef USE_LOG
   // see if the card is present and can be initialized:
@@ -97,6 +98,42 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  /*Collects Pressure and Altitude from the MPL3115A2*/
+  #ifdef USE_MPL
+    /*Checks if the MPL3115A2 is reading data*/
+    if (! mpl.performReading()) {
+      Serial.println("Failed to perform reading :(");
+      return;
+    }
+  /*Logs the Pressure*/
+  #if USE_SERIAL
+    Serial.print("Pressure: ");
+    Serial.print(mpl.getPressure());
+    Serial.println(" hPa");
+  #endif // USE_SERIAL
+  #ifdef USE_LOG
+    logfile.print("Pressure, "); logfile.println(mpl.getPressure());  
+  #endif // USE_LOG
+  /*Logs the altitude*/
+  #if USE_SERIAL
+    Serial.print("Approx. Altitude = ");
+    Serial.print(bme.readAltitude(mpl.getAltitude());
+    Serial.println(" m");
+  #endif // USE_SERIAL
+  #ifdef USE_LOG
+    logfile.print("Altitude, "); logfile.println(mpl.getAltitude());    
+  #endif // USE_LOG
+  #endif // USE_MPL
 
+  /*Actually makes sure this logs data*/
+  #ifdef USE_LOG
+    logfile.flush();
+  #endif // USE_LOG
+
+  /*idr what this is for*/
+  #ifdef USE_SERIAL
+    Serial.println();
+  #endif // USE_SERIAL
+
+    delay(2000);
 }
