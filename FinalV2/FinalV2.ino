@@ -2,7 +2,7 @@
 #include <SPI.h>
 #include <SD.h>
 #include <Adafruit_MPL3115A2.h>
-#include "RTClib.h"
+#include <RTClib.h>
 
 #define MPL_SCK 13
 #define MPL_MISO 12
@@ -11,14 +11,14 @@
 #define cardSelect 4
 #define ERROR_DISPLAY_PIN 13
 #define geigerPin 1
-#define millisecondsBetweenCountReports 60000
+#define millisecondsBetweenCountReports 60000-1000
 #define SEALEVELPRESSURE_HPA (1017) //Change this value to the sea level pressure for current location during launch 
 volatile int particleCount = 0;
 
 #define USE_MPL 1
 #define USE_RTC 1
 #define USE_LOG 1
-#define USE_SERIAL 1 //Comment this out for flight to save memory
+#define USE_SERIAL 1
 
 #ifdef USE_MPL
 Adafruit_MPL3115A2 mpl;
