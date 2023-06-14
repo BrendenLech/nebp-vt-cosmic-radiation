@@ -18,7 +18,7 @@ volatile int particleCount = 0;
 #define USE_MPL 1
 #define USE_RTC 1
 #define USE_LOG 1
-#define USE_SERIAL 1
+#define USE_SERIAL 0
 
 #ifdef USE_MPL
 Adafruit_MPL3115A2 mpl;
@@ -46,14 +46,16 @@ void error(uint8_t errno) {
 }
 
 void setup() {
-  Serial.begin(9600);
-  while (!Serial);
+  #ifdef USE_Serial
+    Serial.begin(9600);
+    while (!Serial);
 
-    if (! rtc.begin()) {
-    Serial.println("Couldn't find RTC");
-    Serial.flush();
-    while (1) delay(10);
-  }
+      if (! rtc.begin()) {
+      Serial.println("Couldn't find RTC");
+      Serial.flush();
+      while (1) delay(10);
+    }
+
   /* Geiger Counter Setup */
   // Specifies the pin to use
   pinMode(geigerPin, INPUT);

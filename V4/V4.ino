@@ -4,6 +4,7 @@
 #include <SD.h>
 #include <Adafruit_MPL3115A2.h>
 #include <RTClib.h>
+#include <Adafruit_GPS.h>
 
 #define MPL_SCK 13
 #define MPL_MISO 12
@@ -13,7 +14,6 @@
 #define ERROR_DISPLAY_PIN 13
 #define geigerPin 1
 #define millisecondsBetweenCountReports 6000 - 1000
-//#define millisecondsBetweenCountReports 60000 - 1000
 #define SEALEVELPRESSURE_HPA (1017) //Change this value to the sea level pressure for current location during launch 
 volatile int particleCount = 0;
 
@@ -30,6 +30,13 @@ RTC_DS3231 rtc;
 #ifdef USE_LOG
 File logfile;
 #endif
+
+// Connect to the GPS on the hardware I2C port
+Adafruit_GPS GPS(&Wire);
+
+// Set GPSECHO to 'false' to turn off echoing the GPS data to the Serial console
+// Set to 'true' if you want to debug and listen to the raw GPS sentences
+#define GPSECHO false
 
 void error(uint8_t errno) {
   while(1)   {
@@ -54,6 +61,10 @@ void setup() {
     digitalWrite(LED_BUILTIN, LOW);
     delay(200);
   }
+
+  // This line turns on RMC (recommended minimum) and GGA (fix data) including altitude
+  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
+  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ); // 1 Hz update rate
 
   /* Geiger Counter Setup */
   // Specifies the pin to use
@@ -144,7 +155,7 @@ void setup() {
     delay(200);
   }
 
-  logfile.println(F("Time, Counts, Altitude (m), Pressure (hPa), RTC Temperature (C), MPL Temperature (C)"));
+  logfile.println(F("Time, Counts, MPL Altitude (m), GPS Altitude (m), Pressure (hPa), RTC Temperature (C), MPL Temperature (C)"));
   logfile.flush();
   #endif // USE_LOG
   pinMode(13, OUTPUT);
@@ -170,7 +181,7 @@ void loop() {
   int countsSinceLastReport = particleCount;
   particleCount = 0;
   interrupts();
-
+  
   // Reports the number of counts since the last report
   #ifdef USE_LOG
   #ifdef USE_MPL
@@ -184,6 +195,8 @@ void loop() {
   logfile.print(countsSinceLastReport);
   logfile.print(F(", "));
   logfile.print(mpl.getAltitude());
+  logfile.print(F(", "));
+  logfile.print(GPS.altitude);
   logfile.print(F(", "));
   logfile.print(mpl.getPressure());
   logfile.print(F(", "));
