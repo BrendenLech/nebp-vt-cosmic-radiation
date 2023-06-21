@@ -32,7 +32,8 @@ File logfile;
 #endif
 
 // Connect to the GPS on the hardware I2C port
-Adafruit_GPS GPS(&Wire);
+#define GPSSerial Serial1
+Adafruit_GPS GPS(&GPSSerial);
 
 // Set GPSECHO to 'false' to turn off echoing the GPS data to the Serial console
 // Set to 'true' if you want to debug and listen to the raw GPS sentences
@@ -63,6 +64,7 @@ void setup() {
   }
 
   // This line turns on RMC (recommended minimum) and GGA (fix data) including altitude
+  GPS.begin(9600);
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ); // 1 Hz update rate
 
