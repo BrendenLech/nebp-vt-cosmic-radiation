@@ -11,7 +11,7 @@
 #define cardSelect 4
 #define ERROR_DISPLAY_PIN 13
 #define geigerPin 1
-#define millisecondsBetweenCountReports 6000 - 1000
+#define millisecondsBetweenCountReports 1000
 #define SEALEVELPRESSURE_HPA (1017) //Change this value to the sea level pressure for current location during launch 
 volatile int particleCount = 0;
 
@@ -176,7 +176,7 @@ void loop() {
   logfile.print(F(":"));
   logfile.print(now.second(), DEC);
 
-  Serial.print(F(", CPM "));
+  Serial.print(F(", CPS "));
   Serial.print(countsSinceLastReport);
 
   
